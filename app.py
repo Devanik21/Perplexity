@@ -170,52 +170,7 @@ def add_citations(text, sources):
     return text
 
 # New function for creating PDF export
-def create_pdf(title, content, sources):
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, 
-                            rightMargin=72, leftMargin=72,
-                            topMargin=72, bottomMargin=72)
-    
-    styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Title', 
-                             fontName='Helvetica-Bold',
-                             fontSize=16, 
-                             alignment=1,
-                             spaceAfter=12))
-    
-    story = []
-    
-    # Add title
-    story.append(Paragraph(f"Research Report: {title}", styles['Title']))
-    story.append(Spacer(1, 12))
-    
-    # Add date
-    story.append(Paragraph(f"Generated on: {datetime.now().strftime('%B %d, %Y')}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    
-    # Add content
-    # Remove HTML tags for PDF
-    clean_content = re.sub(r'<.*?>', '', content)
-    paragraphs = clean_content.split('\n\n')
-    for para in paragraphs:
-        if para.strip():
-            story.append(Paragraph(para, styles['Normal']))
-            story.append(Spacer(1, 6))
-    
-    # Add sources
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("Sources", styles['Heading2']))
-    story.append(Spacer(1, 6))
-    
-    for idx, source in enumerate(sources):
-        story.append(Paragraph(f"[{idx+1}] {source['title']}", styles['Normal']))
-        story.append(Paragraph(f"URL: {source['link']}", styles['Normal']))
-        story.append(Spacer(1, 3))
-    
-    doc.build(story)
-    pdf_data = buffer.getvalue()
-    buffer.close()
-    return pdf_data
+
 
 # New function to create topic clusters
 def create_topic_clusters(query, sources):
@@ -616,7 +571,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                 st.markdown(response.text)
             
             # Download options
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2 = st.columns([1, 1, 2])
             
             # Plain text download
             with col1:
@@ -628,14 +583,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                 )
             
             # PDF download option
-            with col2:
-                pdf_data = create_pdf(query, response.text, search_results)
-                st.download_button(
-                    label="📑 Download PDF",
-                    data=pdf_data,
-                    file_name=f"{query.replace(' ', '_')}.pdf",
-                    mime="application/pdf"
-                )
+
             
         # Source Analysis Tab
         with tab2:
