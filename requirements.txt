@@ -1,0 +1,13 @@
+streamlit
+google-generativeai
+beautifulsoup4
+requests
+PyMuPDF
+pandas
+python-docx
+docx2txt
+python-pptx
+openpyxl
+ebooklib
+gitpython
+serpapi
