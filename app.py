@@ -158,7 +158,7 @@ with st.sidebar:
     source_count = st.slider(
         "Number of Sources", 
         min_value=5, 
-        max_value=30, 
+        max_value=100, 
         value=15,
         help="More sources means more comprehensive research"
     )
