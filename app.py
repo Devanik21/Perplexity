@@ -13,7 +13,7 @@ genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
 # --- Streamlit Page Setup ---
-st.set_page_config(page_title="NexusQuery AI Research", layout="wide", page_icon="🧠")
+st.set_page_config(page_title="Orion", layout="wide", page_icon="🪄")
 
 # Custom CSS for better UI
 st.markdown("""
