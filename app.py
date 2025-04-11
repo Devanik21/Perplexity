@@ -44,7 +44,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 class='main-header'> ✨ Orion Research Engine</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-header'> ✨ OrionIQ Research Engine</h1>", unsafe_allow_html=True)
 st.markdown("Unleash knowledge synthesis with AI-powered research that delivers comprehensive insights with real-time data integration.")
 
 # --- Helper Functions ---
@@ -173,7 +173,7 @@ query = st.text_input("🔍 Enter your research query", placeholder="e.g., Quant
 col1, col2 = st.columns([1, 3])
 
 with col1:
-    search_button = st.button("🚀 Initiate Research", use_container_width=True)
+    search_button = st.button(" Initiate Research", use_container_width=True)
     
 with col2:
     if search_mode == "QuickSynth":
