@@ -44,7 +44,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 class='main-header'>🧠 NexusQuery AI Research</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-header'> ✨ Orion Research Engine</h1>", unsafe_allow_html=True)
 st.markdown("Unleash knowledge synthesis with AI-powered research that delivers comprehensive insights with real-time data integration.")
 
 # --- Helper Functions ---
