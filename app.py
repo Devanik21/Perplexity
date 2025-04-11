@@ -330,7 +330,7 @@ Your response should:
 2. Include 3-5 key insights about the topic
 3. Briefly mention different perspectives if they exist
 4. Be written in a conversational yet authoritative tone
-5. Be approximately 400-600 words total
+5. Be approximately 100-500 words total
 
 {features_text}
 
