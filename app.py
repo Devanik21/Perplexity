@@ -193,45 +193,50 @@ elif option == "Perplexity Style Agent (Google Summary)":
             with st.spinner("🔍 Searching and analyzing..."):
                 search_context = get_search_results(query)
 
-                # Construct a detailed prompt for Gemini to generate a high-quality report
+                # Ultra-detailed research prompt for Gemini
                 prompt = f'''
-You are a highly intelligent research assistant.
+You are a highly intelligent and articulate research assistant.
 
-Use the search summaries below to write a detailed report on: "{query}"
+Using the search snippets below, write an in-depth research article on: "{query}"
 
-Your report should include:
-1. A thorough explanation of the topic
-2. Real-world applications or use-cases
-3. Current challenges or criticisms
-4. Future directions or potential
-5. A conclusion that summarizes key insights
+The article must be at least **5000 words** and include extensive detail, academic tone, and structured formatting with headings, bullet points, and examples.
+
+Include:
+1. A thorough and nuanced explanation of the topic
+2. Real-world applications and case studies
+3. Current challenges, limitations, and criticisms
+4. Ongoing research, future directions, and potential innovations
+5. A strong conclusion that synthesizes the core ideas and offers forward-thinking perspectives
+
+Please include citations if possible, and use a formal but clear tone throughout.
 
 Search Snippets:
 {search_context}
 '''
 
-                # Call the Gemini model to generate the response
+                # Generate ultra-long-form content using Gemini
                 response = model.generate_content(
                     [prompt],
                     generation_config=genai.types.GenerationConfig(
                         temperature=0.7,
-                        max_output_tokens=2048
+                        max_output_tokens=8192  # Max token length for deeper responses
                     )
                 )
 
-                # Display the AI-generated report in the app
-                st.markdown("### 📋 AI-Generated Report")
+                # Display the AI-generated deep-dive report
+                st.markdown("### 📋 AI-Generated Deep Research Report")
                 st.write(response.text)
 
-                # Let the user download the report as a text file
+                # Let the user download the long-form research
                 st.download_button(
-                    label="📄 Download Report",
+                    label="📄 Download Full Report",
                     data=response.text,
-                    file_name=f"{query.replace(' ', '_')}_report.txt",
+                    file_name=f"{query.replace(' ', '_')}_deep_research.txt",
                     mime="text/plain"
                 )
 
         except Exception as e:
             st.error(f"Something went wrong: {e}")
+
 
 
