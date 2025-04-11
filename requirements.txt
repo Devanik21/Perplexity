@@ -11,3 +11,6 @@ openpyxl
 ebooklib
 gitpython
 serpapi
+reportlab
+matplotlib
+networkx
