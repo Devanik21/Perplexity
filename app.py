@@ -162,22 +162,76 @@ Question: {question}
         except Exception as e:
             st.error(f"Error cloning or reading the repo: {e}")
 
-# --- Perplexity-Like Google Agent ---
 elif option == "Perplexity Style Agent (Google Summary)":
     st.subheader("🧠 Perplexity-Like Q&A using Google")
     query = st.text_input("Enter your search query")
 
+    # Function to fetch Google search results using SerpAPI
+    def get_search_results(query):
+        url = "https://serpapi.com/search"
+        params = {
+            "q": query,
+            "engine": "google",
+            "api_key": st.secrets["SERPAPI_KEY"],
+            "num": 20  # Fetch more results for broader context
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        results = ""
+
+        # Format each result into a readable string with title, snippet, and link
+        for result in data.get("organic_results", []):
+            title = result.get("title", "")
+            link = result.get("link", "")
+            snippet = result.get("snippet", "")
+            results += f"🔸 **{title}**\n{snippet}\n🔗 {link}\n\n"
+        return results
+
+    # Handle user interaction: when "Get Summary" is clicked and query is provided
     if st.button("Get Summary") and query:
         try:
-            search_context = get_search_results(query)
-            prompt = f"""You are a smart assistant. Use the following search result summaries to generate a detailed and accurate answer.
+            with st.spinner("🔍 Searching and analyzing..."):
+                search_context = get_search_results(query)
 
-Search Results:
+                # Construct a detailed prompt for Gemini to generate a high-quality report
+                prompt = f'''
+You are a highly intelligent research assistant.
+
+Use the search summaries below to write a detailed report on: "{query}"
+
+Your report should include:
+1. A thorough explanation of the topic
+2. Real-world applications or use-cases
+3. Current challenges or criticisms
+4. Future directions or potential
+5. A conclusion that summarizes key insights
+
+Search Snippets:
 {search_context}
+'''
 
-Question: {query}
-"""
-            response = model.generate_content(prompt)
-            st.write(response.text)
+                # Call the Gemini model to generate the response
+                response = model.generate_content(
+                    [prompt],
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.7,
+                        max_output_tokens=2048
+                    )
+                )
+
+                # Display the AI-generated report in the app
+                st.markdown("### 📋 AI-Generated Report")
+                st.write(response.text)
+
+                # Let the user download the report as a text file
+                st.download_button(
+                    label="📄 Download Report",
+                    data=response.text,
+                    file_name=f"{query.replace(' ', '_')}_report.txt",
+                    mime="text/plain"
+                )
+
         except Exception as e:
             st.error(f"Something went wrong: {e}")
+
+
