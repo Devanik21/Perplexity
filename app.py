@@ -91,7 +91,7 @@ if st.session_state.theme == "light":
 else:
     st.markdown(dark_theme, unsafe_allow_html=True)
 
-st.markdown("<h1 class='main-header'> ✨ Deep Research Engine</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-header'> 🌌 Deep Research Engine</h1>", unsafe_allow_html=True)
 st.markdown("Unleash knowledge synthesis with AI-powered research that delivers comprehensive insights with real-time data integration.")
 
 # --- Helper Functions ---
