@@ -10,7 +10,7 @@ from datetime import datetime
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 # --- Dark/Light Mode Config ---
 if 'theme' not in st.session_state:
@@ -247,7 +247,7 @@ with st.sidebar:
     
     st.divider()
     st.caption("Last updated: April 2025")
-    st.caption("Powered by Gemini 2.0 Flash")
+    st.caption("Powered by Gemini 2.5 Flash")
 
 # --- Main Interface ---
 query = st.text_input("🔍 Enter your research query", placeholder="e.g., Quantum computing applications in medicine")
