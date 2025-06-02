@@ -196,45 +196,45 @@ with st.sidebar:
     # Original features
     citation_style = st.selectbox(
         "Citation Style", 
-        ["Inline Numbers", "Academic (APA)", "None"],
-        help="Choose how sources are cited in the output"
+        ["Inline Numbers", "Academic (APA)", "None"], # Default to "Inline Numbers"
+        help="Inline Numbers: Adds [1] style citations. Academic (APA): AI attempts APA (experimental). None: No specific style."
     )
     
     perspective_toggle = st.toggle(
         "Include Multiple Perspectives", 
         value=True,
-        help="Analyze different viewpoints on the topic"
+        help="Analyze different viewpoints on the topic, citing key proponents or evidence if found."
     )
     
     # New features
     future_insights = st.toggle(
         "Future Insights", 
         value=True,
-        help="Include predictions and future trends"
+        help="Include a dedicated section on predictions, potential future developments, and emerging trends."
     )
     
     data_visualization = st.toggle(
         "Data Visualization", 
-        value=False,
-        help="Include charts and visualizations when applicable"
+        value=False, # Defaulting to False as per your input for refinement
+        help="If enabled, AI will suggest 1-2 specific charts/graphs for key data/trends (does not generate images)."
     )
     
     executive_summary = st.toggle(
         "Executive Summary", 
         value=True,
-        help="Add a concise executive summary at the beginning"
+        help="Add a concise executive summary (or abstract for OmniSynth) at the beginning of the report."
     )
     
     historical_context = st.toggle(
         "Historical Context", 
         value=False,
-        help="Include relevant historical background information"
+        help="If enabled, include relevant historical background and the evolution of the topic."
     )
     
     expert_quotes = st.toggle(
         "Expert Quotes", 
         value=False,
-        help="Include quotes from domain experts when available"
+        help="If enabled, incorporate notable quotes from domain experts when found in sources."
     )
     
     source_count = st.slider(
@@ -306,20 +306,30 @@ if search_button and query:
             # Prepare model prompt based on selected mode and features
             feature_instructions = []
             if future_insights:
-                feature_instructions.append("Include a section on potential future developments and trends.")
-            if perspective_toggle:
-                feature_instructions.append("Present multiple viewpoints and competing theories where they exist.")
+                feature_instructions.append("Include a dedicated section discussing potential future developments, predictions, and emerging trends related to the topic.")
             if data_visualization:
-                feature_instructions.append("Suggest relevant charts, graphs or visual representations of key data points.")
-            if executive_summary:
-                feature_instructions.append("Start with a concise executive summary highlighting key findings.")
+                feature_instructions.append("If the analysis reveals quantifiable data, trends, or comparisons, suggest 1-2 specific charts or graphs (e.g., bar chart, line graph, pie chart) that could visualize these insights. Clearly state what data from the provided search context would be used for each axis or segment of the suggested visualization.")
             if historical_context:
-                feature_instructions.append("Include relevant historical background on the topic's development.")
+                feature_instructions.append("Include a section detailing the relevant historical background and the evolution of the topic.")
             if expert_quotes:
-                feature_instructions.append("Include notable quotes or insights from recognized experts in the field.")
+                feature_instructions.append("Where relevant and available in the provided sources, integrate 1-2 notable quotes or direct insights from recognized experts in the field. Attribute them clearly.")
+            if perspective_toggle:
+                feature_instructions.append("If multiple significant viewpoints or competing theories are evident from the search results, present them clearly. For each, briefly mention its basis or key proponents as found in the search results.")
             
-            features_text = " ".join(feature_instructions)
+            # Executive Summary instruction (conditional on search_mode for specific wording)
+            if executive_summary:
+                if search_mode == "QuickSynth":
+                    feature_instructions.append("Start with a brief 'Executive Summary' (2-3 sentences) that directly answers the query and highlights key takeaways.")
+                elif search_mode == "QuantumSynth":
+                    feature_instructions.append("Ensure the report begins with a dedicated 'Executive Summary' (approx. 100 words) highlighting key findings and conclusions.")
+                else:  # OmniSynth
+                    feature_instructions.append("Ensure the report begins with a comprehensive 'Abstract' (approx. 150-200 words) summarizing the purpose, methods, key findings, and conclusions.")
             
+            # Citation Style instruction
+            if citation_style == "Academic (APA)":
+                feature_instructions.append("If citing specific information from sources, attempt to use APA-style in-text citations. If compiling a reference list is feasible from snippets, attempt an APA-style list at the end. This is a best-effort approach.")
+            
+            features_text = "\n".join(feature_instructions) # Use newline for better clarity in the prompt
             if search_mode == "QuickSynth":
                 prompt = f'''
 You are NexusQuery, an advanced AI research assistant capable of quick yet comprehensive analysis.
@@ -327,7 +337,7 @@ Based on the search results below, create a concise yet informative summary for:
 
 Your response should:
 1. Start with a clear, direct answer in 2-3 sentences
-2. Include 3-5 key insights about the topic
+2. Include 3-5 key insights about the topic (unless an Executive Summary is requested, which should cover this)
 3. Briefly mention different perspectives if they exist
 4. Be written in a conversational yet authoritative tone
 5. Be approximately 100-500 words total
@@ -418,13 +428,22 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
             
             st.markdown(f"<h2>{heading}</h2>", unsafe_allow_html=True)
             
-            # Display with citation numbers if selected
-            if citation_style == "Inline Numbers":
-                response_with_citations = add_citations(response.text, search_results)
-                st.markdown(response_with_citations, unsafe_allow_html=True)
-            else:
-                st.markdown(response.text)
-            
+            # Display response, handling citations and potential errors
+            if response.candidates and response.text:
+                generated_text = response.text
+                if citation_style == "Inline Numbers":
+                    # Only apply custom citation if AI isn't trying APA, to avoid conflicts
+                    response_with_citations = add_citations(generated_text, search_results)
+                    st.markdown(response_with_citations, unsafe_allow_html=True)
+                else:
+                    # For APA or None, display what the AI generated directly
+                    st.markdown(generated_text)
+            elif response.candidates and not response.text:
+                 st.warning("The AI model generated a response, but it contained no text content. This might be due to safety filters or an issue with the prompt.")
+            else: # No candidates, likely an error during generation
+                st.error("The AI model did not return a valid response. Please check the logs or try again.")
+                if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
+                    st.error(f"Prompt Feedback: {response.prompt_feedback}")
             # Download options
             col1, col2 = st.columns([1, 3])
             with col1:
