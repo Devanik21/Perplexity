@@ -691,7 +691,7 @@ with st.sidebar:
     source_count = st.slider(
         "Sources to Analyze", 
         min_value=10, 
-        max_value=50, 
+        max_value=100, 
         value=25,
         help="More sources = more comprehensive analysis"
     )
