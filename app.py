@@ -118,7 +118,7 @@ class ResearchEngine:
                 "safe": "active"
             }
             
-            response = requests.get("https://serpapi.com/search", params=search_params, timeout=300)
+            response = requests.get("https://serpapi.com/search", params=search_params, timeout=120)
             data = response.json()
             
             organic_results = data.get("organic_results", [])
@@ -130,7 +130,7 @@ class ResearchEngine:
             academic_params["num"] = min(10, num_results // 2)
             
             try:
-                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=200)
+                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=120)
                 academic_data = academic_response.json()
                 organic_results.extend(academic_data.get("organic_results", [])[:5])
             except:
@@ -1263,23 +1263,31 @@ CITATION STYLE: {config.citation_style}
                     'Domain Type': [s.domain.split('.')[-1] if '.' in s.domain else 'other' for s in sources]
                 })
                 
-                fig_scatter = px.scatter(
-                    credibility_data, 
-                    x='Word Count', 
-                    y='Credibility Score',
-                    color='Domain Type',
-                    size=[100] * len(credibility_data),  # Fixed size
-                    hover_data=['Source'],
-                    title="Source Quality vs Content Depth Analysis"
-                )
-                
-                fig_scatter.update_layout(
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    font_color='white'
-                )
-                
-                st.plotly_chart(fig_scatter, use_container_width=True)
+                # Check if the DataFrame has data before trying to plot
+                if not credibility_data.empty:
+                    fig_scatter = px.scatter(
+                        credibility_data, 
+                        x='Word Count', 
+                        y='Credibility Score',
+                        color='Domain Type',
+                        hover_data=['Source'],
+                        title="Source Quality vs Content Depth Analysis"
+                    )
+                    
+                    # This is the correct way to set a fixed marker size
+                    fig_scatter.update_traces(marker_size=10)
+                    
+                    fig_scatter.update_layout(
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font_color='white'
+                    )
+                    
+                    st.plotly_chart(fig_scatter, use_container_width=True)
+                else:
+                    # Display a message if there's no data to show
+                    st.info("No source data available to display the quality chart.")
+
                 
                 # Detailed source list
                 st.markdown("### 🔍 Detailed Source Analysis")
