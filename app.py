@@ -118,7 +118,7 @@ class ResearchEngine:
                 "safe": "active"
             }
             
-            response = requests.get("https://serpapi.com/search", params=search_params, timeout=30)
+            response = requests.get("https://serpapi.com/search", params=search_params, timeout=300)
             data = response.json()
             
             organic_results = data.get("organic_results", [])
