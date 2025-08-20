@@ -103,9 +103,8 @@ class ResearchEngine:
         except:
             return 0.5
     
-        def enhanced_search(self, query: str, num_results: int = 20) -> List[SearchResult]:
-       # """Enhanced search with multiple parameters and result processing"""
-        # --- Start of Corrected Block ---
+    def enhanced_search(self, query: str, num_results: int = 20) -> List[SearchResult]:
+        """Enhanced search with multiple parameters and result processing"""
         try:
             # Primary search
             results = []
@@ -119,30 +118,23 @@ class ResearchEngine:
                 "safe": "active"
             }
             
-            # Use a try-except block to catch timeout errors gracefully
-            try:
-                response = requests.get("https://serpapi.com/search", params=search_params, timeout=30)
-                response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
-                data = response.json()
-                organic_results = data.get("organic_results", [])
-            except requests.exceptions.RequestException as e:
-                logger.warning(f"Primary search request failed: {e}")
-                organic_results = [] # Treat as no results on error
-
+            response = requests.get("https://serpapi.com/search", params=search_params, timeout=120)
+            data = response.json()
+            
+            organic_results = data.get("organic_results", [])
+            
             # Also search for academic sources
             academic_query = f"{query} site:edu OR site:arxiv.org OR site:pubmed.ncbi.nlm.nih.gov"
             academic_params = search_params.copy()
             academic_params["q"] = academic_query
             academic_params["num"] = min(10, num_results // 2)
             
-            # Use another try-except block for the academic search
             try:
-                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=20)
-                academic_response.raise_for_status()
+                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=120)
                 academic_data = academic_response.json()
                 organic_results.extend(academic_data.get("organic_results", [])[:5])
-            except requests.exceptions.RequestException as e:
-                logger.warning(f"Academic search failed, continuing with standard results: {e}")
+            except:
+                logger.warning("Academic search failed, continuing with standard results")
             
             for idx, result in enumerate(organic_results[:num_results]):
                 try:
@@ -171,8 +163,6 @@ class ResearchEngine:
             st.error(f"Search failed: {e}")
             logger.error(f"Enhanced search failed: {e}")
             return []
-        # --- End of Corrected Block ---
-
     
     def extract_content_parallel(self, results: List[SearchResult], max_workers: int = 5) -> List[SearchResult]:
         """Extract content from multiple URLs in parallel"""
@@ -213,7 +203,7 @@ class ResearchEngine:
                 "Upgrade-Insecure-Requests": "1"
             }
             
-            response = requests.get(url, headers=headers, timeout=120, verify=False)
+            response = requests.get(url, headers=headers, timeout=150, verify=False)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, 'html.parser')
