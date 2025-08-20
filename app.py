@@ -130,7 +130,7 @@ class ResearchEngine:
             academic_params["num"] = min(10, num_results // 2)
             
             try:
-                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=20)
+                academic_response = requests.get("https://serpapi.com/search", params=academic_params, timeout=200)
                 academic_data = academic_response.json()
                 organic_results.extend(academic_data.get("organic_results", [])[:5])
             except:
@@ -203,7 +203,7 @@ class ResearchEngine:
                 "Upgrade-Insecure-Requests": "1"
             }
             
-            response = requests.get(url, headers=headers, timeout=15, verify=False)
+            response = requests.get(url, headers=headers, timeout=150, verify=False)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, 'html.parser')
