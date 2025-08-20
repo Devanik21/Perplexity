@@ -104,7 +104,7 @@ class ResearchEngine:
             return 0.5
     
         def enhanced_search(self, query: str, num_results: int = 20) -> List[SearchResult]:
-        """Enhanced search with multiple parameters and result processing"""
+       # """Enhanced search with multiple parameters and result processing"""
         # --- Start of Corrected Block ---
         try:
             # Primary search
