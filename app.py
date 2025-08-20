@@ -10,7 +10,7 @@ from datetime import datetime
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.5-flash-preview-04-17")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 # --- Dark/Light Mode Config ---
 if 'theme' not in st.session_state:
