@@ -1611,18 +1611,29 @@ Full report attached.
                 # Research statistics
                 st.markdown("### 📊 Research Statistics")
                 
+                # --- Start of Corrected Block ---
+                
+                # Safely calculate the average credibility score
+                sources_list = results['sources']
+                if len(sources_list) > 0:
+                    avg_cred_score = sum(s.credibility_score for s in sources_list) / len(sources_list)
+                else:
+                    avg_cred_score = 0.0
+
                 stats_data = {
                     "Research Query": results['query'],
-                    "Total Sources Found": len(results['sources']),
-                    "High-Quality Sources": len([s for s in results['sources'] if s.credibility_score > 0.7]),
-                    "Academic Sources": len([s for s in results['sources'] if '.edu' in s.domain]),
-                    "Government Sources": len([s for s in results['sources'] if '.gov' in s.domain]),
+                    "Total Sources Found": len(sources_list),
+                    "High-Quality Sources": len([s for s in sources_list if s.credibility_score > 0.7]),
+                    "Academic Sources": len([s for s in sources_list if '.edu' in s.domain]),
+                    "Government Sources": len([s for s in sources_list if '.gov' in s.domain]),
                     "Total Words Analyzed": f"{results['total_words']:,}",
                     "Processing Time": f"{results['processing_time']} seconds",
-                    "Average Credibility Score": f"{sum(s.credibility_score for s in results['sources']) / len(results['sources']):.3f}",
+                    "Average Credibility Score": f"{avg_cred_score:.3f}",
                     "Research Mode": results['config'].search_mode,
                     "Citation Style": results['config'].citation_style
                 }
+                
+                # --- End of Corrected Block ---
                 
                 stats_df = pd.DataFrame(list(stats_data.items()), columns=['Metric', 'Value'])
                 st.table(stats_df)
