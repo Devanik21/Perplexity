@@ -91,6 +91,61 @@ if st.session_state.theme == "light":
 else:
     st.markdown(dark_theme, unsafe_allow_html=True)
 
+# --- START: PASSWORD PROTECTION ---
+# Initialize session state variables for authentication
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "login_attempts" not in st.session_state:
+    st.session_state.login_attempts = 0
+
+# Define the maximum number of allowed attempts
+MAX_ATTEMPTS = 3
+
+try:
+    # The password should be set in your Streamlit secrets
+    # e.g., in .streamlit/secrets.toml
+    # research_app_password = "your_secret_password"
+    correct_password = st.secrets["research_app_password"]
+except KeyError:
+    st.error("`research_app_password` not found in secrets.toml. Please set it to run the app.")
+    st.stop()
+
+# If not authenticated, show the login screen.
+if not st.session_state.authenticated:
+    
+    # Check if the user is locked out
+    if st.session_state.login_attempts >= MAX_ATTEMPTS:
+        st.error("🚫 **Access Blocked**")
+        st.warning("Too many incorrect password attempts. Please close and reopen the app to try again.")
+        st.stop()
+
+    # Display the login form
+    st.markdown("<h2 class='main-header'>Login Required</h2>", unsafe_allow_html=True)
+    
+    password = st.text_input(
+        "Enter Password",
+        type="password",
+        key="password_input_field",
+        label_visibility="collapsed",
+        placeholder="Enter password to unlock"
+    )
+    
+    if st.button("Enter", use_container_width=True):
+        if password == correct_password:
+            st.session_state.authenticated = True
+            st.session_state.login_attempts = 0 # Reset on success
+            st.rerun()
+        else:
+            st.session_state.login_attempts += 1
+            attempts_left = MAX_ATTEMPTS - st.session_state.login_attempts
+            st.error(f"Incorrect password. You have {attempts_left} attempt(s) left.")
+            time.sleep(1)
+            st.rerun()
+
+    # Stop the app from running further if not authenticated
+    st.stop()
+# --- END: PASSWORD PROTECTION ---
+
 st.markdown("<h1 class='main-header'> 🌌 Deep Research Engine</h1>", unsafe_allow_html=True)
 st.markdown("Unleash knowledge synthesis with AI-powered research that delivers comprehensive insights with real-time data integration.")
 
