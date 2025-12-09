@@ -402,8 +402,8 @@ with st.sidebar:
     )
     
     st.divider()
-    st.caption("Model: Gemma 2 27B Instruct")
-    st.caption("Last Calibration: April 2025")
+    st.caption("Model: Gemma 3 27B Instruct")
+    st.caption("Last Calibration: March 2025")
 
 # --- Main Interface ---
 query = st.text_input("🔍 Enter Research Query", placeholder="e.g., Applications of quantum computing in medicine")
