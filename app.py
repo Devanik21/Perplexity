@@ -74,7 +74,7 @@ dark_theme = """
 """
 
 # --- Streamlit Page Setup ---
-st.set_page_config(page_title="✨ Orion", layout="wide", page_icon="")
+st.set_page_config(page_title=" Orion", layout="wide", page_icon="✨")
 
 # --- START: BACKGROUND IMAGE & TRANSPARENCY ---
 def set_app_background(image_file):
