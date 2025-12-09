@@ -7,6 +7,15 @@ import random
 import re
 from datetime import datetime
 import os
+
+# PDF Generation - you may need to install these:
+# pip install markdown2 weasyprint
+try:
+    import markdown2
+    from weasyprint import HTML, CSS
+except ImportError:
+    st.error("PDF generation libraries not found. Please run: pip install markdown2 weasyprint")
+
 import base64
 
 # --- 🔐 API Setup ---
@@ -552,13 +561,26 @@ if st.session_state.research_complete:
         else:
             st.markdown(st.session_state.generated_text)
 
-        # Download button
-        st.download_button(
-            label="📄 Download Report",
-            data=st.session_state.generated_text,
-            file_name=st.session_state.report_filename,
-            mime="text/plain"
-        )
+        # --- Download Buttons ---
+        st.divider()
+        dl_col1, dl_col2 = st.columns(2)
+        with dl_col1:
+            st.download_button(
+                label="📄 Download as Text (.txt)",
+                data=st.session_state.generated_text,
+                file_name=st.session_state.report_filename,
+                mime="text/plain",
+                use_container_width=True
+            )
+        with dl_col2:
+            pdf_filename = st.session_state.report_filename.replace(".txt", ".pdf")
+            st.download_button(
+                label="📄 Download as PDF",
+                data=create_pdf_report(st.session_state.generated_text, st.session_state.theme),
+                file_name=pdf_filename,
+                mime="application/pdf",
+                use_container_width=True
+            )
 
     with tab2:
         st.subheader("Sources Analyzed")
