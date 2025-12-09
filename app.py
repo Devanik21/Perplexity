@@ -116,6 +116,10 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background: transparent !important;
     }
+    /* Make the chat input bar transparent */
+    [data-testid="stChatInput"] {
+        background-color: transparent !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 # --- END: BACKGROUND IMAGE & TRANSPARENCY ---
