@@ -19,3 +19,5 @@ aiohttp
 weasyprint
 markdown2
 wordcloud
+Pillow
+pypdf
