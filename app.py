@@ -294,49 +294,51 @@ with st.sidebar:
         ["Inline Numbers", "Academic (APA)", "None"], # Default to "Inline Numbers"
         help="Inline Numbers: Adds [1] style citations. Academic (APA): AI attempts APA (experimental). None: No specific style."
     )
+    st.subheader("Future Updates(beta)")
+    st.markdown("---")
     perspective_toggle = st.toggle(
         "Include Multiple Perspectives", 
         value=True,
         help="Analyze different viewpoints on the topic, citing key proponents or evidence if found."
     )
     
-    # # New features
-    # future_insights = st.toggle(
-    #     "Future Insights", 
-    #     value=True,
-    #     help="Include a dedicated section on predictions, potential future developments, and emerging trends."
-    # )
+    # New features
+    future_insights = st.toggle(
+        "Future Insights", 
+        value=True,
+        help="Include a dedicated section on predictions, potential future developments, and emerging trends."
+    )
     
-    # data_visualization = st.toggle(
-    #     "Data Visualization", 
-    #     value=False, # Defaulting to False as per your input for refinement
-    #     help="If enabled, AI will suggest 1-2 specific charts/graphs for key data/trends (does not generate images)."
-    # )
+    data_visualization = st.toggle(
+        "Data Visualization", 
+        value=False, # Defaulting to False as per your input for refinement
+        help="If enabled, AI will suggest 1-2 specific charts/graphs for key data/trends (does not generate images)."
+    )
     
-    # executive_summary = st.toggle(
-    #     "Executive Summary", 
-    #     value=True,
-    #     help="Add a concise executive summary (or abstract for OmniSynth) at the beginning of the report."
-    # )
+    executive_summary = st.toggle(
+        "Executive Summary", 
+        value=True,
+        help="Add a concise executive summary (or abstract for OmniSynth) at the beginning of the report."
+    )
     
-    # historical_context = st.toggle(
-    #     "Historical Context", 
-    #     value=False,
-    #     help="If enabled, include relevant historical background and the evolution of the topic."
-    # )
+    historical_context = st.toggle(
+        "Historical Context", 
+        value=False,
+        help="If enabled, include relevant historical background and the evolution of the topic."
+    )
     
-    # expert_quotes = st.toggle(
-    #     "Expert Quotes", 
-    #     value=False,
-    #     help="If enabled, incorporate notable quotes from domain experts when found in sources."
-    # )
+    expert_quotes = st.toggle(
+        "Expert Quotes", 
+        value=False,
+        help="If enabled, incorporate notable quotes from domain experts when found in sources."
+    )
     
     source_count = st.slider(
         "Number of Sources", 
         min_value=5, 
         max_value=100, 
         value=15,
-        help="More sources means more comprehensive research."
+        help="More sources means more comprehensive research"
     )
     
     st.divider()
@@ -433,7 +435,6 @@ Your response should:
 3. Briefly mention different perspectives if they exist
 4. Be written in a conversational yet authoritative tone
 5. Be approximately 100-500 words total
-6. **Crucially, ensure your response is complete and does not end abruptly or get cut off.**
 
 {features_text}
 
@@ -442,7 +443,7 @@ Search Results:
 
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
-                max_tokens = 4096
+                max_tokens = 2048
                 heading = "### QuickSynth Results"
                 filename = f"{query.replace(' ', '_')}_quicksynth.txt"
                 
