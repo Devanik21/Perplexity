@@ -81,7 +81,7 @@ def set_app_background(image_file):
     </style>
     """, unsafe_allow_html=True)
 
-set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6 (1) (1).jpeg")
+set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6.jpeg")
 
 # --- CUSTOM CSS: TRANSPARENT SIDEBAR & HEADER ---
 st.markdown("""
@@ -361,44 +361,42 @@ with col2:
     else:  # OmniSynth
         st.caption("🌌 Exhaustive research with expert-level insights (15+ min read)")
 
+# Initialize session state for storing results
+if "research_complete" not in st.session_state:
+    st.session_state.research_complete = False
+if "generated_text" not in st.session_state:
+    st.session_state.generated_text = ""
+if "search_results" not in st.session_state:
+    st.session_state.search_results = []
+if "report_heading" not in st.session_state:
+    st.session_state.report_heading = ""
+if "report_filename" not in st.session_state:
+    st.session_state.report_filename = ""
+
 # Process the search
 if search_button and query:
-    try:
-        # Create tabs for different views
-        tab1, tab2 = st.tabs(["📊 Research Results", "🔎 Source Analysis"])
-        
-        with tab1:
-            progress_col1, progress_col2 = st.columns([3, 1])
-            with progress_col1:
-                progress_bar = st.progress(0)
-                status_text = st.empty()
-            
-            # Simulate research progress
+    st.session_state.research_complete = False # Reset on new search
+    with st.spinner("Initiating research... Please wait."):
+        try:
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+
             status_text.text("🔍 Gathering reliable sources...")
-            for i in range(25):
-                progress_bar.progress(i)
-                time.sleep(0.05)
-            
-            # Fetch search results
             search_results = get_search_results(query, source_count)
-            
+            st.session_state.search_results = search_results # Save sources
+            progress_bar.progress(25)
+
             status_text.text("📚 Analyzing content from multiple sources...")
-            for i in range(25, 50):
-                progress_bar.progress(i)
-                time.sleep(0.05)
-            
-            # Format search context for the model
             search_context = ""
             for result in search_results:
                 search_context += f"Source {result['id']}: {result['title']}\n"
                 search_context += f"Snippet: {result['snippet']}\n"
                 search_context += f"URL: {result['link']}\n\n"
-            
+            progress_bar.progress(50)
+
             status_text.text("🧠 Synthesizing information...")
-            for i in range(50, 75):
-                progress_bar.progress(i)
-                time.sleep(0.05)
-            
+            # (Code for preparing prompt is unchanged, so it's omitted for brevity)
+            # ...
             # Prepare model prompt based on selected mode and features
             feature_instructions = []
             if future_insights:
@@ -411,7 +409,7 @@ if search_button and query:
                 feature_instructions.append("Where relevant and available in the provided sources, integrate 1-2 notable quotes or direct insights from recognized experts in the field. Attribute them clearly.")
             if perspective_toggle:
                 feature_instructions.append("If multiple significant viewpoints or competing theories are evident from the search results, present them clearly. For each, briefly mention its basis or key proponents as found in the search results.")
-            
+
             # Executive Summary instruction (conditional on search_mode for specific wording)
             if executive_summary:
                 if search_mode == "QuickSynth":
@@ -420,11 +418,11 @@ if search_button and query:
                     feature_instructions.append("Ensure the report begins with a dedicated 'Executive Summary' (approx. 100 words) highlighting key findings and conclusions.")
                 else:  # OmniSynth
                     feature_instructions.append("Ensure the report begins with a comprehensive 'Abstract' (approx. 150-200 words) summarizing the purpose, methods, key findings, and conclusions.")
-            
+
             # Citation Style instruction
             if citation_style == "Academic (APA)":
                 feature_instructions.append("If citing specific information from sources, attempt to use APA-style in-text citations. If compiling a reference list is feasible from snippets, attempt an APA-style list at the end. This is a best-effort approach.")
-            
+
             features_text = "\n".join(feature_instructions) # Use newline for better clarity in the prompt
             if search_mode == "QuickSynth":
                 prompt = f'''
@@ -500,14 +498,12 @@ Search Results:
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
                 max_tokens = 8192
-                heading = "### OmniSynth Research Report"
-                filename = f"{query.replace(' ', '_')}_omnisynth.txt"
-            
+                st.session_state.report_heading = "### OmniSynth Research Report"
+                st.session_state.report_filename = f"{query.replace(' ', '_')}_omnisynth.txt"
+
+            progress_bar.progress(75)
             status_text.text("📝 Generating comprehensive response...")
-            for i in range(75, 95):
-                progress_bar.progress(i)
-                time.sleep(0.1)
-            
+
             # Generate response
             response = model.generate_content(
                 [prompt],
@@ -516,70 +512,63 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                     max_output_tokens=max_tokens
                 )
             )
-            
-            # Display final result
+
             progress_bar.progress(100)
             status_text.text("✅ Research complete! Explore results below.")
             time.sleep(0.5)
-            
-            st.markdown(f"<h2>{heading}</h2>", unsafe_allow_html=True)
-            
-            # Display response, handling citations and potential errors
+            status_text.empty() # Clear status text
+            progress_bar.empty() # Clear progress bar
+
             if response.candidates and response.text:
-                generated_text = response.text
-                if citation_style == "Inline Numbers":
-                    # Only apply custom citation if AI isn't trying APA, to avoid conflicts
-                    response_with_citations = add_citations(generated_text, search_results)
-                    st.markdown(response_with_citations, unsafe_allow_html=True)
-                else:
-                    # For APA or None, display what the AI generated directly
-                    st.markdown(generated_text)
+                st.session_state.generated_text = response.text
+                st.session_state.research_complete = True
             elif response.candidates and not response.text:
-                 st.warning("The AI model generated a response, but it contained no text content. This might be due to safety filters or an issue with the prompt.")
+                st.warning("The AI model generated a response, but it contained no text content. This might be due to safety filters or an issue with the prompt.")
+                st.session_state.research_complete = False
             else: # No candidates, likely an error during generation
                 st.error("The AI model did not return a valid response. Please check the logs or try again.")
                 if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
                     st.error(f"Prompt Feedback: {response.prompt_feedback}")
-            # Download options
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                st.download_button(
-                    label="📄 Download Report",
-                    data=response.text,
-                    file_name=filename,
-                    mime="text/plain"
-                )
-            
-        # Source Analysis Tab
-        with tab2:
-            st.subheader("Sources Analyzed")
-            
-            # Display analyzed sources
-            for idx, result in enumerate(search_results):
-                with st.expander(f"Source {idx+1}: {result['title']}"):
-                    st.markdown(f"**Snippet:** {result['snippet']}")
-                    st.markdown(f"**URL:** [{result['link']}]({result['link']})")
-                    
-                    # Add "Deep Dive" button that fetches more content
-                    if st.button(f"🔍 Deep Dive", key=f"dive_{idx}"):
-                        with st.spinner("Extracting content..."):
-                            content = fetch_content(result['link'])
-                            st.markdown("### Extracted Content")
-                            st.markdown(f"<div class='source-box'>{content}</div>", unsafe_allow_html=True)
-            
-            # Source statistics
-            st.subheader("Source Analytics")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total Sources", len(search_results))
-            with col2:
-                st.metric("Academic Sources", f"{random.randint(1, 5)}")
-            with col3:
-                st.metric("Recent Sources (< 1 year)", f"{random.randint(3, 10)}")
-            
-    except Exception as e:
-        st.error(f"Research process encountered an error: {e}")
-        st.error("Please try again with a different query or check your API keys.")
+                st.session_state.research_complete = False
+
+        except Exception as e:
+            st.error(f"Research process encountered an error: {e}")
+            st.error("Please try again with a different query or check your API keys.")
+            st.session_state.research_complete = False
+
+# Display results if they exist in session state
+if st.session_state.research_complete:
+    tab1, tab2 = st.tabs(["📊 Research Results", "🔎 Source Analysis"])
+
+    with tab1:
+        st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
+
+        # Apply citations if needed
+        if citation_style == "Inline Numbers":
+            response_with_citations = add_citations(st.session_state.generated_text, st.session_state.search_results)
+            st.markdown(response_with_citations, unsafe_allow_html=True)
+        else:
+            st.markdown(st.session_state.generated_text)
+
+        # Download button
+        st.download_button(
+            label="📄 Download Report",
+            data=st.session_state.generated_text,
+            file_name=st.session_state.report_filename,
+            mime="text/plain"
+        )
+
+    with tab2:
+        st.subheader("Sources Analyzed")
+        for idx, result in enumerate(st.session_state.search_results):
+            with st.expander(f"Source {idx+1}: {result['title']}"):
+                st.markdown(f"**Snippet:** {result['snippet']}")
+                st.markdown(f"**URL:** [{result['link']}]({result['link']})")
+                if st.button(f"🔍 Deep Dive", key=f"dive_{idx}"):
+                    with st.spinner("Extracting content..."):
+                        content = fetch_content(result['link'])
+                        st.markdown("### Extracted Content")
+                        st.markdown(f"<div class='source-box'>{content}</div>", unsafe_allow_html=True)
 
 # --- Footer ---
 st.divider()
