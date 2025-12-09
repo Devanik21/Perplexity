@@ -16,3 +16,5 @@ matplotlib
 networkx
 plotly
 aiohttp
+weasyprint
+markdown2
