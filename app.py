@@ -648,7 +648,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
 
 # Display results if they exist in session state
 if app_mode == "🌐 Web Research" and st.session_state.research_complete:
-    tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "✨ Data Visualization"])
+    tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "☁️Word Visualization"])
 
     with tab1:
         st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
