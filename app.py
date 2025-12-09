@@ -435,7 +435,7 @@ Your response should:
 3. Briefly mention different perspectives if they exist
 4. Be written in a conversational yet authoritative tone
 5. Be approximately 100-500 words total
-
+6. Crucially, ensure your response is complete and does not end abruptly or get cut off
 {features_text}
 
 Search Results:
@@ -443,7 +443,7 @@ Search Results:
 
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
-                max_tokens = 2048
+                max_tokens = 4096
                 heading = "### QuickSynth Results"
                 filename = f"{query.replace(' ', '_')}_quicksynth.txt"
                 
