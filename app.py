@@ -648,7 +648,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
 
 # Display results if they exist in session state
 if app_mode == "🌐 Web Research" and st.session_state.research_complete:
-    tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "☁️Word Visualization"])
+    tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "✨ Data Visualization"])
 
     with tab1:
         st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
@@ -731,7 +731,7 @@ if app_mode == "🌐 Web Research" and st.session_state.research_complete:
 
 elif app_mode == "📄 Document Analysis":
     st.markdown("### 📄 Document Analysis Mode")
-    st.markdown("Upload one or more documents (PDF, TXT, MD, PNG, JPG) to start a conversation.")
+    st.markdown("Upload one or more documents to start a conversation. The engine will attempt to analyze any file type.")
 
     # Initialize session state for document chat
     if "doc_chat_messages" not in st.session_state:
@@ -745,8 +745,7 @@ elif app_mode == "📄 Document Analysis":
 
     uploaded_files = st.file_uploader(
         "Choose files",
-        accept_multiple_files=True,
-        type=['txt', 'md', 'pdf', 'png', 'jpg', 'jpeg']
+        accept_multiple_files=True
     )
 
     if uploaded_files:
