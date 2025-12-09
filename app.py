@@ -8,8 +8,6 @@ import re
 from datetime import datetime
 import os
 import base64
-import json
-import plotly.graph_objects as go
 
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
@@ -374,8 +372,6 @@ if "report_heading" not in st.session_state:
     st.session_state.report_heading = ""
 if "report_filename" not in st.session_state:
     st.session_state.report_filename = ""
-if "chart_data" not in st.session_state:
-    st.session_state.chart_data = None
 
 # Process the search
 if search_button and query:
@@ -406,14 +402,7 @@ if search_button and query:
             if future_insights:
                 feature_instructions.append("Include a dedicated section discussing potential future developments, predictions, and emerging trends related to the topic.")
             if data_visualization:
-                feature_instructions.append("""
-If the analysis reveals quantifiable data, trends, or comparisons from the provided search context, generate a single, relevant Plotly-compatible JSON object for a chart.
-The JSON must be enclosed in a markdown code block with the language 'json'.
-The JSON object should follow this structure:
-{"chart_type": "bar" | "line" | "pie", "data": {"labels": [...], "values": [...]}, "title": "Chart Title", "xaxis_title": "X-Axis", "yaxis_title": "Y-Axis"}
-For a pie chart, 'xaxis_title' and 'yaxis_title' are not needed.
-Only generate this JSON if meaningful data is found in the sources. Otherwise, omit it.
-""")
+                feature_instructions.append("If the analysis reveals quantifiable data, trends, or comparisons, suggest 1-2 specific charts or graphs (e.g., bar chart, line graph, pie chart) that could visualize these insights. Clearly state what data from the provided search context would be used for each axis or segment of the suggested visualization.")
             if historical_context:
                 feature_instructions.append("Include a section detailing the relevant historical background and the evolution of the topic.")
             if expert_quotes:
@@ -531,21 +520,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
             progress_bar.empty() # Clear progress bar
 
             if response.candidates and response.text:
-                raw_text = response.text
-                # Extract chart JSON if it exists
-                chart_json_match = re.search(r"```json\n({.*?})\n```", raw_text, re.DOTALL)
-                if chart_json_match:
-                    chart_json_str = chart_json_match.group(1)
-                    try:
-                        st.session_state.chart_data = json.loads(chart_json_str)
-                        # Remove the JSON block from the main text to keep the report clean
-                        st.session_state.generated_text = raw_text.replace(chart_json_match.group(0), "").strip()
-                    except json.JSONDecodeError:
-                        st.session_state.chart_data = None
-                        st.session_state.generated_text = raw_text # Keep raw text if JSON is malformed
-                else:
-                    st.session_state.chart_data = None
-                    st.session_state.generated_text = raw_text
+                st.session_state.generated_text = response.text
                 st.session_state.research_complete = True
             elif response.candidates and not response.text:
                 st.warning("The AI model generated a response, but it contained no text content. This might be due to safety filters or an issue with the prompt.")
@@ -567,33 +542,6 @@ if st.session_state.research_complete:
 
     with tab1:
         st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
-
-        # Display chart if data exists
-        if st.session_state.chart_data:
-            try:
-                chart_info = st.session_state.chart_data
-                fig = go.Figure()
-                chart_type = chart_info.get("chart_type", "bar")
-                
-                if chart_type == "bar":
-                    fig.add_trace(go.Bar(x=chart_info["data"]["labels"], y=chart_info["data"]["values"]))
-                elif chart_type == "line":
-                    fig.add_trace(go.Scatter(x=chart_info["data"]["labels"], y=chart_info["data"]["values"], mode='lines+markers'))
-                elif chart_type == "pie":
-                    fig.add_trace(go.Pie(labels=chart_info["data"]["labels"], values=chart_info["data"]["values"]))
-
-                # Set theme based on app's theme state
-                plotly_theme = "plotly_dark" if st.session_state.theme == "dark" else "plotly_white"
-                
-                fig.update_layout(
-                    title=chart_info.get("title", "Data Visualization"),
-                    xaxis_title=chart_info.get("xaxis_title", ""),
-                    yaxis_title=chart_info.get("yaxis_title", ""),
-                    template=plotly_theme
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            except (KeyError, TypeError) as e:
-                st.warning(f"Could not generate chart from AI data. The data might be incomplete. Error: {e}")
 
         # Apply citations if needed
         if citation_style == "Inline Numbers":
