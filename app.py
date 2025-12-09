@@ -74,7 +74,7 @@ dark_theme = """
 """
 
 # --- Streamlit Page Setup ---
-st.set_page_config(page_title="Deep Research Engine", layout="wide", page_icon="")
+st.set_page_config(page_title="✨ Orion", layout="wide", page_icon="")
 
 # --- START: BACKGROUND IMAGE & TRANSPARENCY ---
 def set_app_background(image_file):
@@ -206,7 +206,7 @@ if not st.session_state.authenticated:
     st.stop()
 # --- END: PASSWORD PROTECTION ---
 
-st.markdown("<h1 class='main-header'> ♾️Orion</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-header'> Deep Research Engine</h1>", unsafe_allow_html=True)
 st.markdown("Harnessing AI to navigate the data cosmos and deliver stellar insights with real-time integration.")
 
 # --- Helper Functions ---
