@@ -81,7 +81,7 @@ def set_app_background(image_file):
     </style>
     """, unsafe_allow_html=True)
 
-set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6.jpeg")
+set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6 (1) (1).jpeg")
 
 # --- CUSTOM CSS: TRANSPARENT SIDEBAR & HEADER ---
 st.markdown("""
