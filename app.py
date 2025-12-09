@@ -74,7 +74,7 @@ dark_theme = """
 """
 
 # --- Streamlit Page Setup ---
-st.set_page_config(page_title="Orion Synthesis Engine", layout="wide", page_icon="🌌")
+st.set_page_config(page_title="Orion Synthesis Engine", layout="wide", page_icon="")
 
 # --- START: BACKGROUND IMAGE & TRANSPARENCY ---
 def set_app_background(image_file):
@@ -206,7 +206,7 @@ if not st.session_state.authenticated:
     st.stop()
 # --- END: PASSWORD PROTECTION ---
 
-st.markdown("<h1 class='main-header'> 🌌 Orion Synthesis Engine</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-header'>  Orion Synthesis Engine</h1>", unsafe_allow_html=True)
 st.markdown("Harnessing AI to navigate the data cosmos and deliver stellar insights with real-time integration.")
 
 # --- Helper Functions ---
@@ -419,7 +419,7 @@ with col2:
     elif search_mode == "Synopsis":
         st.caption("🔄 Detailed analysis with balanced perspectives (5-7 min read)")
     else:  # Treatise
-        st.caption("🌌 Exhaustive research with expert-level insights (15+ min read)")
+        st.caption(" Exhaustive research with expert-level insights (15+ min read)")
 
 # Initialize session state for storing results
 if "research_complete" not in st.session_state:
