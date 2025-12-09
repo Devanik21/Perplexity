@@ -74,7 +74,7 @@ dark_theme = """
 """
 
 # --- Streamlit Page Setup ---
-st.set_page_config(page_title="Orion", layout="wide", page_icon="🪄")
+st.set_page_config(page_title="Orion Synthesis Engine", layout="wide", page_icon="🌌")
 
 # --- START: BACKGROUND IMAGE & TRANSPARENCY ---
 def set_app_background(image_file):
@@ -180,17 +180,17 @@ if not st.session_state.authenticated:
         st.stop()
 
     # Display the login form
-    st.markdown("<h2 class='main-header'>Login Required</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='main-header'>Authentication Required</h2>", unsafe_allow_html=True)
     
     password = st.text_input(
-        "Enter Password",
+        "Enter Access Key",
         type="password",
         key="password_input_field",
         label_visibility="collapsed",
-        placeholder="Enter password to unlock"
+        placeholder="Enter access key to engage"
     )
     
-    if st.button("Enter", use_container_width=True):
+    if st.button("Engage", use_container_width=True):
         if password == correct_password:
             st.session_state.authenticated = True
             st.session_state.login_attempts = 0 # Reset on success
@@ -198,7 +198,7 @@ if not st.session_state.authenticated:
         else:
             st.session_state.login_attempts += 1
             attempts_left = MAX_ATTEMPTS - st.session_state.login_attempts
-            st.error(f"Incorrect password. You have {attempts_left} attempt(s) left.")
+            st.error(f"Invalid access key. {attempts_left} attempt(s) remaining before system lockout.")
             time.sleep(1)
             st.rerun()
 
@@ -206,8 +206,8 @@ if not st.session_state.authenticated:
     st.stop()
 # --- END: PASSWORD PROTECTION ---
 
-st.markdown("<h1 class='main-header'> 🌌 Deep Research Engine</h1>", unsafe_allow_html=True)
-st.markdown("Unleash knowledge synthesis with AI-powered research that delivers comprehensive insights with real-time data integration.")
+st.markdown("<h1 class='main-header'> 🌌 Orion Synthesis Engine</h1>", unsafe_allow_html=True)
+st.markdown("Harnessing AI to navigate the data cosmos and deliver stellar insights with real-time integration.")
 
 # --- Helper Functions ---
 
@@ -338,57 +338,57 @@ with st.sidebar:
         st.write(f"{'Dark' if st.session_state.theme == 'dark' else ''} Mode")
     
     st.divider()
-    st.header("⚙️ Query Settings")
+    st.header("⚙️ Synthesis Parameters")
     
     search_mode = st.selectbox(
-        "Intelligence Level", 
+        "Synthesis Depth", 
         ["QuickSynth", "QuantumSynth", "OmniSynth"],
         help="QuickSynth: Fast summary, QuantumSynth: Detailed analysis, OmniSynth: Exhaustive research"
     )
     
-    st.subheader("Advanced Options")
+    st.subheader("Fine-Tuning Controls")
     
     # Original features
     citation_style = st.selectbox(
-        "Citation Style", 
+        "Citation Format", 
         ["Inline Numbers", "Academic (APA)", "None"], # Default to "Inline Numbers"
         help="Inline Numbers: Adds [1] style citations. Academic (APA): AI attempts APA (experimental). None: No specific style."
     )
-    st.subheader("Future Updates(beta)")
+    st.subheader("Experimental Modules (Beta)")
     st.markdown("---")
     perspective_toggle = st.toggle(
-        "Include Multiple Perspectives", 
+        "Analyze Perspectives", 
         value=True,
         help="Analyze different viewpoints on the topic, citing key proponents or evidence if found."
     )
     
     # New features
     future_insights = st.toggle(
-        "Future Insights", 
+        "Project Future Trajectories", 
         value=True,
         help="Include a dedicated section on predictions, potential future developments, and emerging trends."
     )
     
     data_visualization = st.toggle(
-        "Data Visualization", 
+        "Suggest Data Visualizations", 
         value=False, # Defaulting to False as per your input for refinement
         help="If enabled, AI will suggest 1-2 specific charts/graphs for key data/trends (does not generate images)."
     )
     
     executive_summary = st.toggle(
-        "Executive Summary", 
+        "Generate Executive Summary", 
         value=True,
         help="Add a concise executive summary (or abstract for OmniSynth) at the beginning of the report."
     )
     
     historical_context = st.toggle(
-        "Historical Context", 
+        "Include Historical Context", 
         value=False,
         help="If enabled, include relevant historical background and the evolution of the topic."
     )
     
     expert_quotes = st.toggle(
-        "Expert Quotes", 
+        "Incorporate Expert Quotations", 
         value=False,
         help="If enabled, incorporate notable quotes from domain experts when found in sources."
     )
@@ -402,13 +402,13 @@ with st.sidebar:
     )
     
     st.divider()
-    st.caption("Last updated: April 2025")
-    st.caption("Powered by Gemini 2.5 Flash")
+    st.caption("Model: Gemini 2.5 Flash")
+    st.caption("Last Calibration: April 2025")
 
 # --- Main Interface ---
-query = st.text_input("🔍 Enter your research query", placeholder="e.g., Quantum computing applications in medicine")
+query = st.text_input("🔍 Enter Research Query", placeholder="e.g., Applications of quantum computing in medicine")
 
-col1, col2 = st.columns([1, 3])
+col1, col2 = st.columns([1, 4])
 
 with col1:
     search_button = st.button(" Initiate Research", use_container_width=True)
@@ -441,12 +441,12 @@ if search_button and query:
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-            status_text.text("🔍 Gathering reliable sources...")
+            status_text.text("Phase 1/4: Gathering data sources...")
             search_results = get_search_results(query, source_count)
             st.session_state.search_results = search_results # Save sources
             progress_bar.progress(25)
 
-            status_text.text("📚 Analyzing content from multiple sources...")
+            status_text.text("Phase 2/4: Analyzing source content...")
             search_context = ""
             for result in search_results:
                 search_context += f"Source {result['id']}: {result['title']}\n"
@@ -454,7 +454,7 @@ if search_button and query:
                 search_context += f"URL: {result['link']}\n\n"
             progress_bar.progress(50)
 
-            status_text.text("🧠 Synthesizing information...")
+            status_text.text("Phase 3/4: Synthesizing information...")
             # (Code for preparing prompt is unchanged, so it's omitted for brevity)
             # ...
             # Prepare model prompt based on selected mode and features
@@ -564,7 +564,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                 st.session_state.report_filename = f"{query.replace(' ', '_')}_omnisynth.txt"
 
             progress_bar.progress(75)
-            status_text.text("📝 Generating comprehensive response...")
+            status_text.text("Phase 4/4: Generating comprehensive report...")
 
             # Generate response
             response = model.generate_content(
@@ -576,7 +576,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
             )
 
             progress_bar.progress(100)
-            status_text.text("✅ Research complete! Explore results below.")
+            status_text.text("✅ Synthesis complete! Explore the generated report below.")
             time.sleep(0.5)
             status_text.empty() # Clear status text
             progress_bar.empty() # Clear progress bar
@@ -600,7 +600,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
 
 # Display results if they exist in session state
 if st.session_state.research_complete:
-    tab1, tab2, tab3 = st.tabs(["📊 Research Results", "🔎 Source Analysis", "✨ Visualizations"])
+    tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "✨ Data Visualization"])
 
     with tab1:
         st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
@@ -647,7 +647,7 @@ if st.session_state.research_complete:
     
     with tab3:
         if VISUALIZATION_LIBS_AVAILABLE:
-            st.subheader("Keyword Cloud")
+            st.subheader("Report Keyword Cloud")
             st.markdown("A visual representation of the most frequent terms in the research report.")
 
             if st.session_state.generated_text:
@@ -685,7 +685,7 @@ if st.session_state.research_complete:
 st.divider()
 st.markdown("""
 <div style="text-align: center;">
-    <p>NexusQuery AI Research Engine | Powered by Gemini and SerpAPI</p>
+    <p>Orion Synthesis Engine | Powered by Google Gemini & SerpAPI</p>
     <p style="font-size: 0.8em;">This tool synthesizes information from public sources. Always verify critical information.</p>
 </div>
 """, unsafe_allow_html=True)
