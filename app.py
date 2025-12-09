@@ -461,6 +461,7 @@ Your response should:
 6. End with implications and forward-looking insights
 7. Use a professional yet accessible tone
 8. Be approximately 1500-2000 words
+9.Crucially, ensure your response is complete and does not end abruptly or get cut off
 
 {features_text}
 
@@ -489,6 +490,7 @@ Your response should:
 8. Use an academic tone with precise terminology
 9. Be organized with clear sections, subsections, and consistent formatting
 10. Be approximately 4000-5000 words, resembling a scholarly article or white paper
+11.Crucially, ensure your response is complete and does not end abruptly or get cut off
 
 {features_text}
 
