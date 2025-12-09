@@ -112,8 +112,8 @@ set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6 (1) (1).jpeg")
 # --- CUSTOM CSS: TRANSPARENT SIDEBAR & HEADER ---
 st.markdown("""
 <style>
-    /* Make the sidebar and header transparent */
-    [data-testid="stSidebar"], [data-testid="stHeader"] {
+    /* Make the sidebar and header transparent. The header is set to transparent by default with this. */
+    [data-testid="stSidebar"] {
         background: transparent !important;
     }
 </style>
@@ -771,15 +771,19 @@ elif app_mode == "📄 Document Analysis":
                 st.markdown(message["content"])
 
         # Chat input
-        if prompt := st.chat_input("Ask a question about your documents..."):
-            st.session_state.doc_chat_messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
+        prompt = st.text_input("Ask a question about your documents...", placeholder="Type your message here...", label_visibility="collapsed")
+        if st.button("Send", key="send_doc_query"):
+            if prompt:
+                st.session_state.doc_chat_messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
 
-            with st.chat_message("assistant"):
-                response = get_chat_response(prompt, st.session_state.doc_context)
-                st.markdown(response)
-            st.session_state.doc_chat_messages.append({"role": "assistant", "content": response})
+                with st.chat_message("assistant"):
+                    with st.spinner("Thinking..."):
+                        response = get_chat_response(prompt, st.session_state.doc_context)
+                        st.markdown(response)
+                st.session_state.doc_chat_messages.append({"role": "assistant", "content": response})
+                st.rerun()
 
 # --- Footer ---
 st.divider()
