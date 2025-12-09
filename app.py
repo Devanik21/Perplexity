@@ -16,6 +16,14 @@ try:
 except ImportError:
     st.error("PDF generation libraries not found. Please run: pip install markdown2 weasyprint")
 
+# Visualization libraries - you may need to install these:
+# pip install wordcloud matplotlib
+try:
+    from wordcloud import WordCloud
+    import matplotlib.pyplot as plt
+except ImportError:
+    st.error("Visualization libraries not found. Please run: pip install wordcloud matplotlib")
+
 import base64
 
 # --- 🔐 API Setup ---
@@ -589,7 +597,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
 
 # Display results if they exist in session state
 if st.session_state.research_complete:
-    tab1, tab2 = st.tabs(["📊 Research Results", "🔎 Source Analysis"])
+    tab1, tab2, tab3 = st.tabs(["📊 Research Results", "🔎 Source Analysis", "✨ Visualizations"])
 
     with tab1:
         st.markdown(f"<h2>{st.session_state.report_heading}</h2>", unsafe_allow_html=True)
@@ -633,6 +641,39 @@ if st.session_state.research_complete:
                         content = fetch_content(result['link'])
                         st.markdown("### Extracted Content")
                         st.markdown(f"<div class='source-box'>{content}</div>", unsafe_allow_html=True)
+    
+    with tab3:
+        st.subheader("Keyword Cloud")
+        st.markdown("A visual representation of the most frequent terms in the research report.")
+
+        if st.session_state.generated_text:
+            with st.spinner("☁️ Generating keyword cloud..."):
+                try:
+                    # Create a figure and axis for the plot
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    fig.patch.set_facecolor('#121212') # Set figure background
+
+                    # Generate the word cloud
+                    wordcloud = WordCloud(
+                        width=800,
+                        height=400,
+                        background_color=None, # Transparent background
+                        mode="RGBA", # To allow transparency
+                        colormap='viridis', # A vibrant colormap that works well on dark backgrounds
+                        max_words=150,
+                        contour_width=1,
+                        contour_color='steelblue',
+                        random_state=42 # for reproducibility
+                    ).generate(st.session_state.generated_text)
+
+                    # Display the generated image:
+                    ax.imshow(wordcloud, interpolation='bilinear')
+                    ax.axis("off")
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.error(f"Could not generate word cloud: {e}")
+        else:
+            st.warning("No text available to generate a visualization.")
 
 # --- Footer ---
 st.divider()
