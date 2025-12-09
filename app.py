@@ -7,7 +7,7 @@ import random
 import re
 from datetime import datetime
 import os
-
+import matplotlib.pyplot as plt
 # PDF Generation - you may need to install these:
 # pip install markdown2 weasyprint
 try:
