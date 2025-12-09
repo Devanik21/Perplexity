@@ -417,7 +417,7 @@ with col2:
     if search_mode == "Précis":
         st.caption("⚡ Fast synthesis of key information (2-3 min read)")
     elif search_mode == "Synopsis":
-        st.caption("🔄 Detailed analysis with balanced perspectives (5-7 min read)")
+        st.caption("🔄 Detailed analysis with balanced perspectives (5-10 min read)")
     else:  # Treatise
         st.caption(" Exhaustive research with expert-level insights (15+ min read)")
 
@@ -520,8 +520,8 @@ Your response should:
 5. Discuss limitations and criticisms of current approaches
 6. End with implications and forward-looking insights
 7. Use a professional yet accessible tone
-8. Be approximately 1500-2000 words
-9.Crucially, ensure your response is complete and does not end abruptly or get cut off
+8. Be approximately 1500-2500 words
+9. Crucially, ensure your response is complete and does not end abruptly or get cut off
 
 {features_text}
 
@@ -530,7 +530,7 @@ Search Results:
 
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
-                max_tokens = 4096
+                max_tokens = 8192
                 heading = "### Synopsis Analysis"
                 filename = f"{query.replace(' ', '_')}_Synopsis.txt"
                 
@@ -549,8 +549,8 @@ Your response should:
 7. Discuss historical development, current state, and future trajectories
 8. Use an academic tone with precise terminology
 9. Be organized with clear sections, subsections, and consistent formatting
-10. Be approximately 4000-5000 words, resembling a scholarly article or white paper
-11.Crucially, ensure your response is complete and does not end abruptly or get cut off
+10. Be approximately 2000-4000 words, resembling a scholarly article or white paper
+11. Crucially, ensure your response is complete and does not end abruptly or get cut off
 
 {features_text}
 
