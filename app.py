@@ -32,7 +32,7 @@ import base64
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel("gemma-3-27b-it")
 
 # --- Dark/Light Mode Config ---
 if 'theme' not in st.session_state:
@@ -402,7 +402,7 @@ with st.sidebar:
     )
     
     st.divider()
-    st.caption("Model: Gemini 2.5 Flash")
+    st.caption("Model: Gemma 2 27B Instruct")
     st.caption("Last Calibration: April 2025")
 
 # --- Main Interface ---
@@ -509,19 +509,20 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                 
             elif search_mode == "Synopsis":
                 prompt = f'''
-You are NexusQuery, an advanced AI research assistant with the ability to synthesize complex information.
-Based on the search results below, create a detailed analytical report on: "{query}"
+You are NexusQuery, an advanced AI research assistant specializing in detailed analytical reports. Your task is to synthesize the provided search results into a comprehensive synopsis on the topic: "{query}"
 
-Your response should:
-1. Begin with an executive summary (about 100 words)
-2. Provide an in-depth explanation with clear structure using H2 and H3 headings
-3. Include real-world examples and case studies where relevant
-4. Present multiple perspectives on controversial aspects
-5. Discuss limitations and criticisms of current approaches
-6. End with implications and forward-looking insights
-7. Use a professional yet accessible tone
-8. Be approximately 1500-2500 words
-9. Crucially, ensure your response is complete and does not end abruptly or get cut off
+**Core Directives:**
+1.  **Structure and Formatting:**
+    -   Begin with a concise 'Executive Summary' (around 100 words) that highlights the key findings and main conclusions.
+    -   Organize the report with a clear structure using markdown headings (H2, H3) for readability.
+    -   Maintain a professional yet accessible tone throughout the report.
+2.  **Content and Analysis:**
+    -   Provide an in-depth explanation of the topic, incorporating real-world examples or case studies from the search results where relevant.
+    -   If the sources present multiple perspectives or controversial aspects, discuss them in a balanced manner.
+    -   Include a discussion on the implications of the findings and offer some forward-looking insights.
+3.  **Output Requirements:**
+    -   The final output should be a detailed analytical document of approximately 1500-2500 words.
+    -   **Crucially, you must complete the entire report. Do not stop generating text prematurely. Ensure every section is finished and the document concludes properly.**
 
 {features_text}
 
@@ -536,21 +537,22 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
                 
             else:  # Treatise
                 prompt = f'''
-You are NexusQuery, the most advanced AI research assistant available, capable of producing academic-grade comprehensive analysis.
-Based on the search results below, create an exhaustive research report on: "{query}"
+You are NexusQuery, a world-class AI research assistant specializing in creating comprehensive, academic-grade reports. Your task is to synthesize the provided search results into an exhaustive research treatise on the topic: "{query}"
 
-Your response should:
-1. Begin with an abstract summarizing the entire report (150-200 words)
-2. Include a comprehensive table of contents with clear hierarchical structure
-3. Provide extensive detail on all relevant aspects of the topic
-4. Incorporate multiple theoretical frameworks and methodologies
-5. Critically evaluate evidence, identifying strengths and weaknesses
-6. Compare and contrast competing perspectives with nuanced analysis
-7. Discuss historical development, current state, and future trajectories
-8. Use an academic tone with precise terminology
-9. Be organized with clear sections, subsections, and consistent formatting
-10. Be approximately 2000-4000 words, resembling a scholarly article or white paper
-11. Crucially, ensure your response is complete and does not end abruptly or get cut off
+**Core Directives:**
+1.  **Structure and Formatting:**
+    -   Begin with a comprehensive 'Abstract' (150-200 words) summarizing the report's purpose, scope, key findings, and conclusions.
+    -   Follow the abstract with a detailed 'Table of Contents' using markdown for clear hierarchical structure (H2, H3, H4).
+    -   Organize the body of the report into logical sections and subsections as outlined in the table of contents.
+    -   Maintain a formal, academic tone with precise, domain-specific terminology.
+2.  **Content and Analysis:**
+    -   Provide extensive, in-depth detail on all relevant aspects of the topic, drawing from the provided search results.
+    -   Critically evaluate the evidence from the sources, identifying strengths, weaknesses, and gaps in the information.
+    -   Where applicable, discuss the historical development, current state-of-the-art, and potential future trajectories of the topic.
+    -   If competing perspectives or theories exist in the sources, compare and contrast them with nuanced analysis.
+3.  **Output Requirements:**
+    -   The final output should be a complete, scholarly document of approximately 2000-4000 words.
+    -   **Crucially, you must complete the entire report. Do not stop generating text prematurely. Ensure every section is finished and the document concludes properly.**
 
 {features_text}
 
