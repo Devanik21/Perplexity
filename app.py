@@ -3,11 +3,11 @@ import google.generativeai as genai
 import requests
 from bs4 import BeautifulSoup
 import time
-import random
 import re
 from datetime import datetime
-import matplotlib.pyplot as plt
 import os
+import io
+
 # PDF Generation - you may need to install these:
 # pip install markdown2 weasyprint
 try:
@@ -15,6 +15,12 @@ try:
     from weasyprint import HTML, CSS
 except ImportError:
     st.error("PDF generation libraries not found. Please run: pip install markdown2 weasyprint")
+
+try:
+    from PIL import Image
+    import pypdf
+except ImportError:
+    st.error("Required libraries for document analysis not found. Please run: pip install pypdf Pillow")
 
 VISUALIZATION_LIBS_AVAILABLE = True
 # Visualization libraries - you may need to install these:
@@ -32,7 +38,7 @@ import base64
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemma-3-27b-it")
+model = genai.GenerativeModel("gemma-3-27b-it") # Using a multimodal model
 
 # --- Dark/Light Mode Config ---
 if 'theme' not in st.session_state:
@@ -211,6 +217,35 @@ st.markdown("Harnessing AI to navigate the data cosmos and deliver stellar insig
 
 # --- Helper Functions ---
 
+def extract_content_from_file(uploaded_file):
+    """Extracts text or image content from an uploaded file."""
+    file_type = uploaded_file.type
+    if file_type in ["image/jpeg", "image/png"]:
+        return Image.open(uploaded_file)
+    elif file_type == "application/pdf":
+        try:
+            pdf_reader = pypdf.PdfReader(uploaded_file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() or ""
+            return text
+        except Exception as e:
+            return f"Error reading PDF: {e}"
+    elif file_type in ["text/plain", "text/markdown", "text/csv"]:
+        return uploaded_file.getvalue().decode("utf-8")
+    else:
+        st.warning(f"Unsupported file type: {file_type}. Skipping this file.")
+        return None
+
+def get_chat_response(prompt, context_list):
+    """Generates a response from the model for the chat interface."""
+    full_prompt = context_list + [{"role": "user", "parts": [prompt]}]
+    try:
+        response = model.generate_content(full_prompt)
+        return response.text
+    except Exception as e:
+        st.error(f"Error generating response: {e}")
+        return "Sorry, I encountered an error while processing your request."
 
 def create_pdf_report(markdown_content, theme="light"):
     """Converts markdown text to a styled PDF byte stream."""
@@ -405,11 +440,22 @@ with st.sidebar:
     st.caption("Model: Gemma 3 27B Instruct")
     st.caption("Last Calibration: March 2025")
 
-# --- Main Interface ---
-query = st.text_input("🔍 Enter Research Query", placeholder="e.g., Applications of quantum computing in medicine")
+# --- Main Application Logic ---
 
-col1, col2 = st.columns([1, 4])
+# Mode selection
+app_mode = st.radio(
+    "Select Mode",
+    ["🌐 Web Research", "📄 Document Analysis"],
+    horizontal=True,
+    label_visibility="collapsed"
+)
 
+if app_mode == "🌐 Web Research":
+    st.markdown("### 🌐 Web Research Mode")
+    query = st.text_input("🔍 Enter Research Query", placeholder="e.g., Applications of quantum computing in medicine")
+
+    col1, col2 = st.columns([1, 4])
+    
 with col1:
     search_button = st.button(" Initiate Research", use_container_width=True)
     
@@ -419,8 +465,8 @@ with col2:
     elif search_mode == "Synopsis":
         st.caption("🔄 Detailed analysis with balanced perspectives (5-10 min read)")
     else:  # Treatise
-        st.caption(" Exhaustive research with expert-level insights (15+ min read)")
-
+        st.caption("📚 Exhaustive research with expert-level insights (15+ min read)")
+    
 # Initialize session state for storing results
 if "research_complete" not in st.session_state:
     st.session_state.research_complete = False
@@ -432,9 +478,9 @@ if "report_heading" not in st.session_state:
     st.session_state.report_heading = ""
 if "report_filename" not in st.session_state:
     st.session_state.report_filename = ""
-
+    
 # Process the search
-if search_button and query:
+if app_mode == "🌐 Web Research" and search_button and query:
     st.session_state.research_complete = False # Reset on new search
     with st.spinner("Initiating research... Please wait."):
         try:
@@ -601,7 +647,7 @@ Current date: {datetime.now().strftime("%B %d, %Y")}
             st.session_state.research_complete = False
 
 # Display results if they exist in session state
-if st.session_state.research_complete:
+if app_mode == "🌐 Web Research" and st.session_state.research_complete:
     tab1, tab2, tab3 = st.tabs(["📊 Synthesis Report", "🔎 Source Analysis", "✨ Data Visualization"])
 
     with tab1:
@@ -682,6 +728,58 @@ if st.session_state.research_complete:
                 st.warning("No text available to generate a visualization.")
         else:
             st.warning("Visualization libraries are not installed. Please run `pip install wordcloud matplotlib` from your terminal and refresh the page.")
+
+elif app_mode == "📄 Document Analysis":
+    st.markdown("### 📄 Document Analysis Mode")
+    st.markdown("Upload one or more documents (PDF, TXT, MD, PNG, JPG) to start a conversation.")
+
+    # Initialize session state for document chat
+    if "doc_chat_messages" not in st.session_state:
+        st.session_state.doc_chat_messages = []
+    if "doc_context" not in st.session_state:
+        st.session_state.doc_context = []
+
+    uploaded_files = st.file_uploader(
+        "Choose files",
+        accept_multiple_files=True,
+        type=['txt', 'md', 'pdf', 'png', 'jpg', 'jpeg']
+    )
+
+    if uploaded_files:
+        if st.button("Process Uploaded Files", use_container_width=True):
+            st.session_state.doc_chat_messages = [] # Reset chat
+            st.session_state.doc_context = [] # Reset context
+            with st.spinner("Analyzing documents... This may take a moment."):
+                extracted_parts = []
+                for file in uploaded_files:
+                    content = extract_content_from_file(file)
+                    if content:
+                        extracted_parts.append(content)
+                
+                # Create the initial context for the model
+                st.session_state.doc_context = [
+                    {"role": "user", "parts": ["Analyze the following document(s) and prepare to answer questions about them.", *extracted_parts]},
+                    {"role": "model", "parts": ["I have analyzed the document(s). I am ready to answer your questions."]}
+                ]
+                st.session_state.doc_chat_messages.append({"role": "assistant", "content": "✅ I've processed the document(s). What would you like to know?"})
+            st.rerun()
+
+    if st.session_state.doc_context:
+        # Display chat messages
+        for message in st.session_state.doc_chat_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        # Chat input
+        if prompt := st.chat_input("Ask a question about your documents..."):
+            st.session_state.doc_chat_messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            with st.chat_message("assistant"):
+                response = get_chat_response(prompt, st.session_state.doc_context)
+                st.markdown(response)
+            st.session_state.doc_chat_messages.append({"role": "assistant", "content": response})
 
 # --- Footer ---
 st.divider()
