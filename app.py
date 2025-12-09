@@ -342,8 +342,8 @@ with st.sidebar:
     
     search_mode = st.selectbox(
         "Synthesis Depth", 
-        ["QuickSynth", "QuantumSynth", "OmniSynth"],
-        help="QuickSynth: Fast summary, QuantumSynth: Detailed analysis, OmniSynth: Exhaustive research"
+        ["Précis", "Synopsis", "Treatise"],
+        help="Précis: Fast summary, Synopsis: Detailed analysis, Treatise: Exhaustive research"
     )
     
     st.subheader("Fine-Tuning Controls")
@@ -378,7 +378,7 @@ with st.sidebar:
     executive_summary = st.toggle(
         "Generate Executive Summary", 
         value=True,
-        help="Add a concise executive summary (or abstract for OmniSynth) at the beginning of the report."
+        help="Add a concise executive summary (or abstract for Treatise) at the beginning of the report."
     )
     
     historical_context = st.toggle(
@@ -414,11 +414,11 @@ with col1:
     search_button = st.button(" Initiate Research", use_container_width=True)
     
 with col2:
-    if search_mode == "QuickSynth":
+    if search_mode == "Précis":
         st.caption("⚡ Fast synthesis of key information (2-3 min read)")
-    elif search_mode == "QuantumSynth":
+    elif search_mode == "Synopsis":
         st.caption("🔄 Detailed analysis with balanced perspectives (5-7 min read)")
-    else:  # OmniSynth
+    else:  # Treatise
         st.caption("🌌 Exhaustive research with expert-level insights (15+ min read)")
 
 # Initialize session state for storing results
@@ -472,11 +472,11 @@ if search_button and query:
 
             # Executive Summary instruction (conditional on search_mode for specific wording)
             if executive_summary:
-                if search_mode == "QuickSynth":
+                if search_mode == "Précis":
                     feature_instructions.append("Start with a brief 'Executive Summary' (2-3 sentences) that directly answers the query and highlights key takeaways.")
-                elif search_mode == "QuantumSynth":
+                elif search_mode == "Synopsis":
                     feature_instructions.append("Ensure the report begins with a dedicated 'Executive Summary' (approx. 100 words) highlighting key findings and conclusions.")
-                else:  # OmniSynth
+                else:  # Treatise
                     feature_instructions.append("Ensure the report begins with a comprehensive 'Abstract' (approx. 150-200 words) summarizing the purpose, methods, key findings, and conclusions.")
 
             # Citation Style instruction
@@ -484,7 +484,7 @@ if search_button and query:
                 feature_instructions.append("If citing specific information from sources, attempt to use APA-style in-text citations. If compiling a reference list is feasible from snippets, attempt an APA-style list at the end. This is a best-effort approach.")
 
             features_text = "\n".join(feature_instructions) # Use newline for better clarity in the prompt
-            if search_mode == "QuickSynth":
+            if search_mode == "Précis":
                 prompt = f'''
 You are NexusQuery, an advanced AI research assistant capable of quick yet comprehensive analysis.
 Based on the search results below, create a concise yet informative summary for: "{query}"
@@ -504,10 +504,10 @@ Search Results:
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
                 max_tokens = 4096
-                heading = "### QuickSynth Results"
-                filename = f"{query.replace(' ', '_')}_quicksynth.txt"
+                heading = "### Précis Results"
+                filename = f"{query.replace(' ', '_')}_Précis.txt"
                 
-            elif search_mode == "QuantumSynth":
+            elif search_mode == "Synopsis":
                 prompt = f'''
 You are NexusQuery, an advanced AI research assistant with the ability to synthesize complex information.
 Based on the search results below, create a detailed analytical report on: "{query}"
@@ -531,10 +531,10 @@ Search Results:
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
                 max_tokens = 4096
-                heading = "### QuantumSynth Analysis"
-                filename = f"{query.replace(' ', '_')}_quantumsynth.txt"
+                heading = "### Synopsis Analysis"
+                filename = f"{query.replace(' ', '_')}_Synopsis.txt"
                 
-            else:  # OmniSynth
+            else:  # Treatise
                 prompt = f'''
 You are NexusQuery, the most advanced AI research assistant available, capable of producing academic-grade comprehensive analysis.
 Based on the search results below, create an exhaustive research report on: "{query}"
@@ -560,8 +560,8 @@ Search Results:
 Current date: {datetime.now().strftime("%B %d, %Y")}
 '''
                 max_tokens = 8192
-                st.session_state.report_heading = "### OmniSynth Research Report"
-                st.session_state.report_filename = f"{query.replace(' ', '_')}_omnisynth.txt"
+                st.session_state.report_heading = "### Treatise Research Report"
+                st.session_state.report_filename = f"{query.replace(' ', '_')}_Treatise.txt"
 
             progress_bar.progress(75)
             status_text.text("Phase 4/4: Generating comprehensive report...")
