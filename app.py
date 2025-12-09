@@ -294,8 +294,6 @@ with st.sidebar:
         ["Inline Numbers", "Academic (APA)", "None"], # Default to "Inline Numbers"
         help="Inline Numbers: Adds [1] style citations. Academic (APA): AI attempts APA (experimental). None: No specific style."
     )
-    st.subheader("Future Updates(beta)")
-    st.markdown("---")
     perspective_toggle = st.toggle(
         "Include Multiple Perspectives", 
         value=True,
