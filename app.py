@@ -6,11 +6,13 @@ import time
 import random
 import re
 from datetime import datetime
+import os
+import base64
 
 # --- 🔐 API Setup ---
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 # --- Dark/Light Mode Config ---
 if 'theme' not in st.session_state:
@@ -53,6 +55,44 @@ dark_theme = """
 
 # --- Streamlit Page Setup ---
 st.set_page_config(page_title="Orion", layout="wide", page_icon="🪄")
+
+# --- START: BACKGROUND IMAGE & TRANSPARENCY ---
+def set_app_background(image_file):
+    """Sets the background of the Streamlit app to a local image file."""
+    if not os.path.exists(image_file):
+        # Fail silently or show a warning if you prefer, so the app still runs
+        st.warning(f"⚠️ Background image not found: '{image_file}'. Using default theme.")
+        return
+
+    with open(image_file, "rb") as f:
+        img_bytes = f.read()
+
+    base64_img = base64.b64encode(img_bytes).decode()
+
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpeg;base64,{base64_img}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+set_app_background("Gemini_Generated_Image_6zf6sd6zf6sd6zf6.jpeg")
+
+# --- CUSTOM CSS: TRANSPARENT SIDEBAR & HEADER ---
+st.markdown("""
+<style>
+    /* Make the sidebar and header transparent */
+    [data-testid="stSidebar"], [data-testid="stHeader"] {
+        background: transparent !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+# --- END: BACKGROUND IMAGE & TRANSPARENCY ---
 
 # Inject base CSS
 st.markdown("""
