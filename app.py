@@ -6,7 +6,6 @@ import time
 import random
 import re
 from datetime import datetime
-import os
 import matplotlib.pyplot as plt
 # PDF Generation - you may need to install these:
 # pip install markdown2 weasyprint
@@ -16,13 +15,16 @@ try:
 except ImportError:
     st.error("PDF generation libraries not found. Please run: pip install markdown2 weasyprint")
 
+VISUALIZATION_LIBS_AVAILABLE = True
 # Visualization libraries - you may need to install these:
 # pip install wordcloud matplotlib
 try:
     from wordcloud import WordCloud
     import matplotlib.pyplot as plt
 except ImportError:
+    VISUALIZATION_LIBS_AVAILABLE = False
     st.error("Visualization libraries not found. Please run: pip install wordcloud matplotlib")
+    st.warning("The 'Visualizations' tab will be disabled.")
 
 import base64
 
@@ -643,37 +645,40 @@ if st.session_state.research_complete:
                         st.markdown(f"<div class='source-box'>{content}</div>", unsafe_allow_html=True)
     
     with tab3:
-        st.subheader("Keyword Cloud")
-        st.markdown("A visual representation of the most frequent terms in the research report.")
+        if VISUALIZATION_LIBS_AVAILABLE:
+            st.subheader("Keyword Cloud")
+            st.markdown("A visual representation of the most frequent terms in the research report.")
 
-        if st.session_state.generated_text:
-            with st.spinner("☁️ Generating keyword cloud..."):
-                try:
-                    # Create a figure and axis for the plot
-                    fig, ax = plt.subplots(figsize=(12, 6))
-                    fig.patch.set_facecolor('#121212') # Set figure background
+            if st.session_state.generated_text:
+                with st.spinner("☁️ Generating keyword cloud..."):
+                    try:
+                        # Create a figure and axis for the plot
+                        fig, ax = plt.subplots(figsize=(12, 6))
+                        fig.patch.set_facecolor('#121212') # Set figure background
 
-                    # Generate the word cloud
-                    wordcloud = WordCloud(
-                        width=800,
-                        height=400,
-                        background_color=None, # Transparent background
-                        mode="RGBA", # To allow transparency
-                        colormap='viridis', # A vibrant colormap that works well on dark backgrounds
-                        max_words=150,
-                        contour_width=1,
-                        contour_color='steelblue',
-                        random_state=42 # for reproducibility
-                    ).generate(st.session_state.generated_text)
+                        # Generate the word cloud
+                        wordcloud = WordCloud(
+                            width=800,
+                            height=400,
+                            background_color=None, # Transparent background
+                            mode="RGBA", # To allow transparency
+                            colormap='viridis', # A vibrant colormap that works well on dark backgrounds
+                            max_words=150,
+                            contour_width=1,
+                            contour_color='steelblue',
+                            random_state=42 # for reproducibility
+                        ).generate(st.session_state.generated_text)
 
-                    # Display the generated image:
-                    ax.imshow(wordcloud, interpolation='bilinear')
-                    ax.axis("off")
-                    st.pyplot(fig)
-                except Exception as e:
-                    st.error(f"Could not generate word cloud: {e}")
+                        # Display the generated image:
+                        ax.imshow(wordcloud, interpolation='bilinear')
+                        ax.axis("off")
+                        st.pyplot(fig)
+                    except Exception as e:
+                        st.error(f"Could not generate word cloud: {e}")
+            else:
+                st.warning("No text available to generate a visualization.")
         else:
-            st.warning("No text available to generate a visualization.")
+            st.warning("Visualization libraries are not installed. Please run `pip install wordcloud matplotlib` from your terminal and refresh the page.")
 
 # --- Footer ---
 st.divider()
