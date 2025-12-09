@@ -335,7 +335,7 @@ with st.sidebar:
         theme_icon = "🌙" if st.session_state.theme == "light" else "☀️"
         st.button(theme_icon, on_click=toggle_theme, key="theme_toggle")
     with theme_col2:
-        st.write(f"{'Dark' if st.session_state.theme == 'dark' else 'Light'} Mode")
+        st.write(f"{'Dark' if st.session_state.theme == 'dark' else ''} Mode")
     
     st.divider()
     st.header("⚙️ Query Settings")
