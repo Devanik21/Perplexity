@@ -455,18 +455,18 @@ if app_mode == "🌐 Web Research":
     query = st.text_input("🔍 Enter Research Query", placeholder="e.g., Applications of quantum computing in medicine")
 
     col1, col2 = st.columns([1, 4])
-    
-with col1:
-    search_button = st.button(" Initiate Research", use_container_width=True)
-    
-with col2:
-    if search_mode == "Précis":
-        st.caption("⚡ Fast synthesis of key information (2-3 min read)")
-    elif search_mode == "Synopsis":
-        st.caption("🔄 Detailed analysis with balanced perspectives (5-10 min read)")
-    else:  # Treatise
-        st.caption("📚 Exhaustive research with expert-level insights (15+ min read)")
-    
+
+    with col1:
+        search_button = st.button(" Initiate Research", use_container_width=True)
+
+    with col2:
+        if search_mode == "Précis":
+            st.caption("⚡ Fast synthesis of key information (2-3 min read)")
+        elif search_mode == "Synopsis":
+            st.caption("🔄 Detailed analysis with balanced perspectives (5-10 min read)")
+        else:  # Treatise
+            st.caption("📚 Exhaustive research with expert-level insights (15+ min read)")
+
 # Initialize session state for storing results
 if "research_complete" not in st.session_state:
     st.session_state.research_complete = False
