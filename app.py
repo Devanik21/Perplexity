@@ -738,6 +738,10 @@ elif app_mode == "📄 Document Analysis":
         st.session_state.doc_chat_messages = []
     if "doc_context" not in st.session_state:
         st.session_state.doc_context = []
+    if "processed_filenames" not in st.session_state:
+        st.session_state.processed_filenames = []
+    if "initial_summary_done" not in st.session_state:
+        st.session_state.initial_summary_done = False
 
     uploaded_files = st.file_uploader(
         "Choose files",
@@ -747,32 +751,71 @@ elif app_mode == "📄 Document Analysis":
 
     if uploaded_files:
         if st.button("Process Uploaded Files", use_container_width=True):
-            st.session_state.doc_chat_messages = [] # Reset chat
-            st.session_state.doc_context = [] # Reset context
+            # Reset state for new file processing
+            st.session_state.doc_chat_messages = []
+            st.session_state.doc_context = []
+            st.session_state.processed_filenames = []
+            st.session_state.initial_summary_done = False
+
             with st.spinner("Analyzing documents... This may take a moment."):
                 extracted_parts = []
+                filenames = []
                 for file in uploaded_files:
                     content = extract_content_from_file(file)
                     if content:
                         extracted_parts.append(content)
-                
-                # Create the initial context for the model
-                st.session_state.doc_context = [
-                    {"role": "user", "parts": ["Analyze the following document(s) and prepare to answer questions about them.", *extracted_parts]},
-                    {"role": "model", "parts": ["I have analyzed the document(s). I am ready to answer your questions."]}
-                ]
-                st.session_state.doc_chat_messages.append({"role": "assistant", "content": "✅ I've processed the document(s). What would you like to know?"})
+                        filenames.append(file.name)
+                st.session_state.processed_filenames = filenames
+
+                if extracted_parts:
+                    # New prompt for summary and suggested questions
+                    summary_prompt = f"""
+                    You are an expert research assistant. I have uploaded the following document(s): {', '.join(filenames)}.
+                    Please perform two tasks:
+                    1.  Provide a concise, high-level summary of the combined content of all documents.
+                    2.  Based on the content, suggest 3-4 insightful questions that I could ask to delve deeper into the material.
+
+                    Format your response in markdown. Start with a "### Document Summary" heading, followed by the summary. Then, add a "### Suggested Questions" heading, followed by a bulleted list of the questions.
+                    """
+                    # Create the initial context for the model with the documents
+                    st.session_state.doc_context = [
+                        {"role": "user", "parts": ["Analyze the following document(s) and prepare to answer questions about them.", *extracted_parts]},
+                        {"role": "model", "parts": ["I have analyzed the document(s). I am ready to answer your questions."]}
+                    ]
+
+                    # Get the initial summary
+                    initial_summary = get_chat_response(summary_prompt, st.session_state.doc_context)
+                    st.session_state.doc_chat_messages.append({"role": "assistant", "content": initial_summary})
+                    st.session_state.initial_summary_done = True
+                else:
+                    st.warning("No content could be extracted from the uploaded files.")
+
             st.rerun()
 
     if st.session_state.doc_context:
+        # --- UI for Processed Files and Chat Controls ---
+        with st.expander("📚 Processed Documents & Controls", expanded=True):
+            st.markdown("**Currently loaded files:**")
+            for name in st.session_state.processed_filenames:
+                st.markdown(f"- `{name}`")
+            st.divider()
+
+            c1, c2 = st.columns(2)
+            if c1.button("🧹 Clear Chat History", use_container_width=True):
+                st.session_state.doc_chat_messages = []
+                st.rerun()
+
+            chat_export_data = "\n\n".join([f'**{m["role"].title()}**:\n{m["content"]}' for m in st.session_state.doc_chat_messages])
+            c2.download_button("💾 Export Chat (.txt)", data=chat_export_data, file_name="document_chat_export.txt", use_container_width=True)
+
         # Display chat messages
         for message in st.session_state.doc_chat_messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
         # Chat input
-        prompt = st.text_input("Ask a question about your documents...", placeholder="Type your message here...", label_visibility="collapsed")
-        if st.button("Send", key="send_doc_query"):
+        prompt = st.chat_input("Ask a question about your documents...")
+        if prompt:
             if prompt:
                 st.session_state.doc_chat_messages.append({"role": "user", "content": prompt})
                 with st.chat_message("user"):
